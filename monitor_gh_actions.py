@@ -85,6 +85,11 @@ async def run_check():
             body_text = await page.locator("body").inner_text()
             if BUSINESS_NAME_HINT not in body_text:
                 logging.warning("Business panel is check mein nahi mila - page structure change ho sakta hai.")
+                # Debug ke liye screenshot aur page text save karein
+                await page.screenshot(path="debug_screenshot.png", full_page=True)
+                with open("debug_page_text.txt", "w", encoding="utf-8") as f:
+                    f.write(body_text[:5000])  # pehle 5000 characters
+                logging.info("Debug screenshot aur text save ho gaya - GitHub Actions artifact mein milega.")
 
             is_on = await check_message_button(page)
 
