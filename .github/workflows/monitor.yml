@@ -1,0 +1,33 @@
+name: LSA Message Monitor
+
+on:
+  schedule:
+    # Har 5 minute baad chalega (GitHub Actions ka minimum interval)
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+    # Ye manually "Run workflow" button se bhi chala sakte hain testing ke liye
+
+jobs:
+  check-message-status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Repo checkout karein
+        uses: actions/checkout@v4
+
+      - name: Python setup karein
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Dependencies install karein
+        run: |
+          pip install playwright requests
+          playwright install --with-deps chromium
+
+      - name: Monitor script chalayen
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python monitor_gh_actions.py
